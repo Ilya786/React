@@ -25,18 +25,10 @@ module.exports = {
         rules: [
             {
                 test: /\.(js|jsx)$/,
-                exclude: /node_modules/,
-                use: {
-                    loader: 'babel-loader'
-                }
-            },
-            /*{
-
-                test: /\.(js|jsx)$/,
                 include: `${__dirname}/static_src`,
                 loader: 'babel-loader?presets[]=react&presets[]=es2015&presets[]=stage-1',
                 exclude: /node_modules/,
-            },*/
+            },
             {
                 test: /\.css$/,
                 loader: 'style-loader!css-loader',
@@ -62,5 +54,5 @@ module.exports = {
         aggregateTimeout: 100,
     },
 
-    // devtool: NODE_ENV === 'development' ? 'cheap-inline-module-source-map' : false,
+    devtool: NODE_ENV === 'development' ? 'cheap-inline-module-source-map' : false,
 };

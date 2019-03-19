@@ -13,6 +13,6 @@ const element = (param) =>  <div className='test'>{param}</div>;
 
 
 ReactDOM.render(
-    element,
+    element('jh'),
     document.getElementById('root'),
 );

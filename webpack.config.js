@@ -4,7 +4,7 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 
 module.exports = {
     entry: {
-        app: './index.js',
+        app: './index.jsx',
     },
     context: `${__dirname}/static_src`,
     output: {
@@ -25,9 +25,11 @@ module.exports = {
         rules: [
             {
                 test: /\.(js|jsx)$/,
-                include: `${__dirname}/static_src`,
-                loader: 'babel-loader?presets[]=react&presets[]=es2015&presets[]=stage-1',
+                // include: `${__dirname}/static_src,
                 exclude: /node_modules/,
+                use: {
+                    loader: 'babel-loader'
+                }
             },
             {
                 test: /\.css$/,
@@ -54,5 +56,5 @@ module.exports = {
         aggregateTimeout: 100,
     },
 
-    devtool: NODE_ENV === 'development' ? 'cheap-inline-module-source-map' : false,
+    devtool: NODE_ENV === 'development' ? 'cheap-inline-module-source-map' : true,
 };

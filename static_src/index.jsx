@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import 'styels/reset.css'
 import 'styels/styels.scss'
 
 // const element = React.createElement(
@@ -7,12 +8,16 @@ import 'styels/styels.scss'
 //     {className: 'element'},
 //     'Test'
 // );
+class Element extends React.Component{
+    render() {
+        return (<div>gkjl</div>);
+    };
+}
 
-
-const element = (param) =>  <div className='test'>{param}</div>;
+// const element = (param) =>  <div className='test'>{param}</div>;
 
 
 ReactDOM.render(
-    element('jh'),
+    <Element/>,
     document.getElementById('root'),
 );

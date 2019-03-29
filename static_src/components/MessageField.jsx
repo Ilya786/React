@@ -1,49 +1,35 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import TextField from 'material-ui/TextField';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import SendIcon from 'material-ui/svg-icons/content/send';
 import Message from './Message';
 import '../styels/messages.scss';
+
 export default class MessageField extends React.Component {
-    state = {
-        messageList: [],
-        messages: {},
+    static  propTypes = {
+        messageList: PropTypes.arrayOf(PropTypes.number).isRequired,
+        messages: PropTypes.object.isRequired,
+        curId: PropTypes.number,
+        handleSendMessage: PropTypes.func.isRequired,
+    };
+    defaultProps = {
         curId: 1,
+    };
+    state = {
         input: '',
     };
 
-    componentDidMount() {
-        this.handleReply();
-    }
 
-    componentDidUpdate(prevProps, prevState) {
-        const { messages, messageList, curId } = this.state;
-        const lastMessageSender = messages[curId - 1] ? messages[curId - 1].sender : '';
-        if (prevState.messageList.length < messageList.length && lastMessageSender === 'me') {
-            setTimeout(this.handleReply, 2000);
-        }
-    }
 
     handleInput = (e) => {
         this.setState({ [e.target.name]: e.target.value })
     };
 
-    handleSendMessage = () => {
-        const { messageList, messages, curId, input } = this.state;
-        if (input.length > 0) {
-            const newMessageList = [...messageList, curId];
-            const newMessages = { ...messages, [curId]: {text: input, sender: 'me'} };
-            this.setState({ messages: newMessages, messageList: newMessageList, curId: curId + 1, input: '' })
-        }
+    handleSendMessage = () =>{
+        this.props.handleSendMessage(this.state.input);
+        this.setState({input: ''});
     };
-
-    handleReply = () => {
-        const { messageList, messages, curId } = this.state;
-        const newMessageList = [...messageList, curId];
-        const newMessages = { ...messages, [curId]: {text: 'Отстань, я робот', sender: 'bot'} };
-        this.setState({ messages: newMessages, messageList: newMessageList, curId: curId + 1 })
-    };
-
     handleKeyUp = (evt) => {
         if (evt.keyCode === 13) { // Enter
             this.handleSendMessage();
@@ -51,7 +37,7 @@ export default class MessageField extends React.Component {
     };
 
     render() {
-        const { messageList, messages } = this.state;
+        const { messageList, messages } = this.props;
 
         const messageComponents = messageList.map((messageId, index) =>
             <Message

@@ -1,60 +1,83 @@
 import React from 'react';
-import Message from './Message'
-
+import TextField from 'material-ui/TextField';
+import FloatingActionButton from 'material-ui/FloatingActionButton';
+import SendIcon from 'material-ui/svg-icons/content/send';
+import Message from './Message';
+import '../styels/messages.scss';
 export default class MessageField extends React.Component {
     state = {
-        messages: [],
+        messageList: [],
+        messages: {},
+        curId: 1,
+        input: '',
     };
-    // componentDidMount() {
-    //     const newMessages = [...this.state.messages, 'mess'];
-    //     setTimeout(() => this.setState({ messages: newMessages }), 1000)
-    // }
 
-    componentDidUpdate() {
-        if (this.state.messages[this.state.messages.length-1] === 'Вопрос!'){
-            const newMessages = [...this.state.messages, 'Ответ'];
-            setTimeout(() => this.setState({ messages: newMessages }), 1000)
-        }else if (this.state.messages[this.state.messages.length - 1] === 'Хочу задать вопрос'){
-            const newMessages = [...this.state.messages, 'Задавайте вопрос'];
-            setTimeout(() => this.setState({ messages: newMessages }), 1000)
-        }
-
+    componentDidMount() {
+        this.handleReply();
     }
 
-    handleClick = () => {
-        const newMessages = [...this.state.messages, 'Хочу задать вопрос'];
-        if(this.state.messages.length === 0 ||
-            this.state.messages[this.state.messages.length-1] === 'До свидания') {
-            this.setState({ messages: newMessages })
+    componentDidUpdate(prevProps, prevState) {
+        const { messages, messageList, curId } = this.state;
+        const lastMessageSender = messages[curId - 1] ? messages[curId - 1].sender : '';
+        if (prevState.messageList.length < messageList.length && lastMessageSender === 'me') {
+            setTimeout(this.handleReply, 2000);
+        }
+    }
+
+    handleInput = (e) => {
+        this.setState({ [e.target.name]: e.target.value })
+    };
+
+    handleSendMessage = () => {
+        const { messageList, messages, curId, input } = this.state;
+        if (input.length > 0) {
+            const newMessageList = [...messageList, curId];
+            const newMessages = { ...messages, [curId]: {text: input, sender: 'me'} };
+            this.setState({ messages: newMessages, messageList: newMessageList, curId: curId + 1, input: '' })
         }
     };
-    handleClick2 = () => {
-        const newMessages = [...this.state.messages, 'Вопрос!'];
-        if(this.state.messages[this.state.messages.length-1] === 'Задавайте вопрос' ||
-            this.state.messages[this.state.messages.length-1] === 'Ответ') {
-            this.setState({ messages: newMessages })
-        }
+
+    handleReply = () => {
+        const { messageList, messages, curId } = this.state;
+        const newMessageList = [...messageList, curId];
+        const newMessages = { ...messages, [curId]: {text: 'Отстань, я робот', sender: 'bot'} };
+        this.setState({ messages: newMessages, messageList: newMessageList, curId: curId + 1 })
     };
-    handleClick3 = () => {
-        const newMessages = [...this.state.messages, 'До свидания'];
-        if(this.state.messages.length === 0 ||
-            this.state.messages[this.state.messages.length-1] === 'До свидания') {
-        }else{
-            this.setState({ messages: newMessages })
+
+    handleKeyUp = (evt) => {
+        if (evt.keyCode === 13) { // Enter
+            this.handleSendMessage();
         }
     };
 
     render() {
-        const messages = this.state.messages.map((message, index) =>
-            <Message key={ index } text={ message } />
+        const { messageList, messages } = this.state;
+
+        const messageComponents = messageList.map((messageId, index) =>
+            <Message
+                key={ index }
+                text={ messages[messageId].text }
+                sender={ messages[messageId].sender }
+            />
         );
 
         return (
-            <div>
-                { messages }
-                <button onClick={ this.handleClick }>Начать диалог</button>
-                <button onClick={ this.handleClick2 }>Задть вопрос</button>
-                <button onClick={ this.handleClick3 }>Завершить диалог</button>
+            <div className="message-box">
+                <div className="message-field">
+                    { messageComponents }
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                    <TextField
+                        name="input"
+                        hintText="Hint Text"
+                        value={ this.state.input }
+                        onChange={ this.handleInput }
+                        onKeyUp={ this.handleKeyUp }
+                    />
+                    <FloatingActionButton style={{ }} onClick={ this.handleSendMessage }>
+                        <SendIcon />
+                    </FloatingActionButton>
+                </div>
             </div>
         )
     }

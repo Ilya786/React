@@ -1,9 +1,9 @@
 import React from 'react';
-import MessageField from './MessageField';
+import Layout from './Layout';
 
 
 export default class App extends React.Component {
     render() {
-        return <MessageField />
+        return <Layout />
     }
 }

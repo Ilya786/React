@@ -19,6 +19,7 @@ module.exports = {
 
     plugins: [
         new webpack.NoEmitOnErrorsPlugin(),
+        new webpack.DefinePlugin({ __IS_DEV__: NODE_ENV === 'development' }),
     ],
 
     module: {

@@ -1,14 +1,37 @@
 import React from 'react';
-import '../styels/header.css'
+import PropTypes from 'prop-types';
+import { bindActionCreators } from "redux";
+import { test } from "../actions/testActions";
+import connect from "react-redux/es/connect/connect";
 
-export default class Header extends React.Component {
+
+class Header extends React.Component {
+    static propTypes = {
+        messageCount: PropTypes.number,
+        counter: PropTypes.number.isRequired,
+        data: PropTypes.string
+    };
+
+    static defaultProps = {
+        messageCount: 0,
+        data: 'Пусто'
+    };
 
     render() {
         return (
-            <header className="header">
-                <h3 className="chatName">chat 1</h3>
-                <p className="quantityMessage">{this.props.quantityMessage}</p>
-            </header>
-        )
+            <div className="header">
+                { this.props.messageCount }
+                counter: { this.props.counter }
+                data: { this.props.data }
+            </div>)
     }
 }
+
+const mapStateToProps = ({ testReducer }) => ({
+    counter: testReducer.counter,
+    data: testReducer.data,
+});
+
+const mapDispatchToProps = dispatch => bindActionCreators({}, dispatch);
+
+export default connect(mapStateToProps, mapDispatchToProps)(Header);

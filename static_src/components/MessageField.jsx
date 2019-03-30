@@ -1,35 +1,52 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { bindActionCreators } from 'redux';
+import connect from 'react-redux/es/connect/connect';
 import TextField from 'material-ui/TextField';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import SendIcon from 'material-ui/svg-icons/content/send';
+import { sendMessage, replyMessage } from '../actions/messageActions';
 import Message from './Message';
 import '../styels/messages.scss';
 
-export default class MessageField extends React.Component {
-    static  propTypes = {
+class MessageField extends React.Component {
+    static propTypes = {
         messageList: PropTypes.arrayOf(PropTypes.number).isRequired,
         messages: PropTypes.object.isRequired,
-        curId: PropTypes.number,
-        handleSendMessage: PropTypes.func.isRequired,
+        nextId: PropTypes.number,
+        sendMessage: PropTypes.func.isRequired,
+        replyMessage: PropTypes.func.isRequired,
     };
+
     defaultProps = {
-        curId: 1,
+        nextId: 1,
     };
+
     state = {
         input: '',
     };
 
-
+    componentDidUpdate(prevProps) {
+        const { messages, messageList, nextId } = this.props;
+        const lastMessageSender = messages[nextId - 1] ? messages[nextId - 1].sender : '';
+        if (prevProps.messageList.length < messageList.length && lastMessageSender === 'me') {
+            setTimeout(this.handleReply, 2000);
+        }
+    }
 
     handleInput = (e) => {
         this.setState({ [e.target.name]: e.target.value })
     };
 
-    handleSendMessage = () =>{
-        this.props.handleSendMessage(this.state.input);
-        this.setState({input: ''});
+    handleSendMessage = () => {
+        this.props.sendMessage(this.state.input);
+        this.setState({ input: '' });
     };
+
+    handleReply = () => {
+        this.props.replyMessage();
+    };
+
     handleKeyUp = (evt) => {
         if (evt.keyCode === 13) { // Enter
             this.handleSendMessage();
@@ -48,11 +65,11 @@ export default class MessageField extends React.Component {
         );
 
         return (
-            <div className="message-box">
+            <div>
                 <div className="message-field">
                     { messageComponents }
                 </div>
-                <div style={{ textAlign: 'center' }}>
+                <div>
                     <TextField
                         name="input"
                         hintText="Hint Text"
@@ -60,7 +77,7 @@ export default class MessageField extends React.Component {
                         onChange={ this.handleInput }
                         onKeyUp={ this.handleKeyUp }
                     />
-                    <FloatingActionButton style={{ }} onClick={ this.handleSendMessage }>
+                    <FloatingActionButton onClick={ this.handleSendMessage }>
                         <SendIcon />
                     </FloatingActionButton>
                 </div>
@@ -68,3 +85,13 @@ export default class MessageField extends React.Component {
         )
     }
 }
+
+const mapStateToProps = ({ messageReducer }) => ({
+    messageList: messageReducer.messageList,
+    messages: messageReducer.messages,
+    nextId: messageReducer.nextId,
+});
+
+const mapDispatchToProps = dispatch => bindActionCreators({ sendMessage, replyMessage }, dispatch);
+
+export default connect(mapStateToProps, mapDispatchToProps)(MessageField);
